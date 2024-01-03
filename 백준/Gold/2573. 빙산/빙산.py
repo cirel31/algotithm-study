@@ -1,50 +1,44 @@
 from _collections import deque
 
-def melt_iceberg(iceberg, N, M):
-    temp = [[0]*M for _ in range(N)]
-    for i in range(N):
-        for j in range(M):
-            if iceberg[i][j] > 0:
-                for di, dj in delta:
-                    ni, nj = i + di, j + dj
-                    if 0 <= ni < N and 0 <= nj < M and iceberg[ni][nj] == 0:
-                        temp[i][j] += 1
-    for i in range(N):
-        for j in range(M):
-            iceberg[i][j] = max(0, iceberg[i][j] - temp[i][j])
 
-def count_iceberg_parts(iceberg, N, M):
-    visited = [[False]*M for _ in range(N)]
-    part_count = 0
-    for i in range(N):
-        for j in range(M):
-            if iceberg[i][j] > 0 and not visited[i][j]:
-                bfs(iceberg, i, j, visited, N, M)
-                part_count += 1
-    return part_count
-
-def bfs(iceberg, x, y, visited, N, M):
-    que = deque([(x, y)])
-    visited[x][y] = True
+def solve(p, q):
+    que.append((p, q))
     while que:
-        cx, cy = que.popleft()
+        x, y = que.popleft()
         for dx, dy in delta:
-            nx, ny = cx + dx, cy + dy
-            if 0 <= nx < N and 0 <= ny < M and not visited[nx][ny] and iceberg[nx][ny] > 0:
-                visited[nx][ny] = True
-                que.append((nx, ny))
+            nx, my = x + dx, y + dy
+            if 0 <= nx < n and 0 <= my < m:
+                if area[nx][my] and not visited[nx][my]:
+                    que.append((nx, my))
+                    visited[nx][my] = 1
+                if not area[nx][my]:
+                    visited[x][y] += 1
 
-N, M = map(int, input().split())
-iceberg = [list(map(int, input().split())) for _ in range(N)]
+
+n, m = map(int, input().split())
+area = [list(map(int, input().split())) for _ in range(n)]
+que = deque()
 delta = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-year = 0
-while True:
-    year += 1
-    melt_iceberg(iceberg, N, M)
-    parts = count_iceberg_parts(iceberg, N, M)
-    if parts == 0:
-        print(0)
+ans = 0
+while 1:
+    visited = [[0 for _ in range(m)] for _ in range(n)]
+    cnt = 0
+    for i in range(n):
+        for j in range(m):
+            if area[i][j] and not visited[i][j]:
+                visited[i][j] = 1
+                solve(i, j)
+                cnt += 1
+    for i in range(n):
+        for j in range(m):
+            if visited[i][j]:
+                area[i][j] -= (visited[i][j] - 1)
+                if area[i][j] < 0:
+                    area[i][j] = 0
+    ans += 1
+    if not cnt:
+        print(cnt)
+        exit()
+    if cnt >= 2:
         break
-    if parts > 1:
-        print(year)
-        break
+print(ans - 1)
