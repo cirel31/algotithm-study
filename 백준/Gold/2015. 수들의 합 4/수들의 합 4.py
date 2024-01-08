@@ -13,6 +13,7 @@ for num in li:
     prefix_sum += num  # 현재 위치까지의 누적합
 
     # 누적합에서 k를 뺀 값이 이전에 존재하는지 확인하여 count를 업데이트
+    # get(key, default) >> key가 dict에 존재하지 않는다면, default로 지정된 값을 반환
     count += sum_count.get(prefix_sum - k, 0)
 
     # 현재 누적합의 등장 횟수를 업데이트
