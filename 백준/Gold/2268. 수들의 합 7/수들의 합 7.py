@@ -1,34 +1,51 @@
 import sys
 
+# 세그먼트 트리 구축
+def build_segment_tree():
+    # 리프 노드 초기화
+    for i in range(n):
+        tree[n + i] = arr[i]
+    # 내부 노드 구축
+    for i in range(n - 1, 0, -1):
+        tree[i] = tree[i * 2] + tree[i * 2 + 1]
+
 # 세그먼트 트리 업데이트
-def modify(node, start, end, idx, val):
-    if idx < start or idx > end:
-        return
-    if start == end:
-        tree[node] = val
-        return
-    mid = (start + end) // 2
-    modify(node * 2, start, mid, idx, val)
-    modify(node * 2 + 1, mid + 1, end, idx, val)
-    tree[node] = tree[node * 2] + tree[node * 2 + 1]
+def update_segment_tree(idx, val):
+    idx += n
+    tree[idx] = val
+    while idx > 1:
+        idx //= 2
+        tree[idx] = tree[idx * 2] + tree[idx * 2 + 1]
 
 # 구간 합 쿼리
-def sum_query(node, start, end, left, right):
-    if left > end or right < start:
-        return 0
-    if left <= start and end <= right:
-        return tree[node]
-    mid = (start + end) // 2
-    return sum_query(node * 2, start, mid, left, right) + sum_query(node * 2 + 1, mid + 1, end, left, right)
+def sum_query(left, right):
+    left += n
+    right += n
+    sum_val = 0
+    while left < right:
+        if left % 2:
+            sum_val += tree[left]
+            left += 1
+        if right % 2:
+            right -= 1
+            sum_val += tree[right]
+        left //= 2
+        right //= 2
+    return sum_val
+
 
 input = sys.stdin.readline
-n, m = map(int, input().rstrip().split())
-tree = [0] * (4 * n)
+n, m = map(int, input().split())
+arr = [0] * n  # 초기 배열
+tree = [0] * (2 * n)  # 세그먼트 트리
+
+build_segment_tree()
+
 for _ in range(m):
-    op, i, j = map(int, input().rstrip().split())
+    op, i, j = map(int, input().split())
     if op == 0:
         if i > j:
             i, j = j, i
-        print(sum_query(1, 0, n-1, i-1, j-1))
+        print(sum_query(i - 1, j))
     else:
-        modify(1, 0, n-1, i-1, j)
+        update_segment_tree(i - 1, j)
