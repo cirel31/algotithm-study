@@ -1,8 +1,7 @@
 import bisect, sys
 
 
-import bisect
-
+input = sys.stdin.readline
 n = int(input())
 lines = [tuple(map(int, input().split())) for _ in range(n)]
 lines.sort()  # a를 기준으로 정렬
