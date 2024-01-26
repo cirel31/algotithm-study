@@ -1,19 +1,20 @@
-def solve(x):
-    binary = bin(x)[2:]
-    delta = len(binary)
-    res = 0
-    for i in range(delta):
-        if binary[i] == '1':
-            idx = delta - i - 1
-            res += visited[idx]
-            res += (x - 2**idx + 1)
-            x = x - 2**idx
+def setting():
+    res = [0] * 64
+    res[0] = 1
+    for i in range(1, 64):
+        res[i] = res[i - 1] * 2 + (1 << i)
     return res
 
 
+def solve(x):
+    ans = x & 1
+    for i in range(64, 0, -1):
+        if x & (1 << i):
+            ans += visited[i - 1] + (x - (1 << i) + 1)
+            x -= 1 << i
+    return ans
+
+
+visited = setting()
 A, B = map(int, input().split())
-visited = [0 for _ in range(64)]
-for i in range(1, 64):
-    visited[i] = 2**(i-1) + 2*visited[i-1]
-ans = solve(B) - solve(A-1)
-print(ans)
+print(solve(B) - solve(A - 1))
